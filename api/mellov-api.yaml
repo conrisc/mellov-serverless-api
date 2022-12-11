@@ -1,0 +1,123 @@
+openapi: 3.0.0
+info:
+    description: "Mellov API"
+    version: 1.0.0
+    title: "Mellov API"
+    license:
+        name: "Apache 2.0"
+        url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+#basePath: "/api"
+tags:
+    - name: "admins"
+      description: "Secured Admin-only calls"
+    - name: "developers"
+      description: "Operations available to regular developers"
+    - name: "users"
+      description: "Operations available to signed in users"
+#schemes:
+#    - "https"
+paths:
+    /songs:
+        get:
+            tags:
+                - "users"
+            summary: "Search songs"
+            description: "Find songs"
+            operationId: "searchSongs"
+            parameters:
+                - name: "skip"
+                  in: "query"
+                  description: "number of records to skip for pagination"
+                  required: false
+                  schema:
+                      type: "integer"
+                      minimum: 0
+                      format: "int32"
+                - name: "limit"
+                  in: "query"
+                  description: "maximum number of records to return"
+                  required: false
+                  schema:
+                      type: "integer"
+                      maximum: 300
+                      minimum: 0
+                      format: "int32"
+                - name: "title"
+                  in: "query"
+                  description: "a phrase song's title must contain"
+                  required: false
+                  schema:
+                      type: "string"
+                - name: "tags"
+                  in: "query"
+                  description: "tags which song must contain"
+                  required: false
+                  schema:
+                      type: "array"
+                      items:
+                          type: "string"
+                - name: "sort"
+                  in: "query"
+                  description: "type of sort to use"
+                  required: false
+                  schema:
+                      type: "string"
+            responses:
+                200:
+                    description: "search result matching criteria"
+                    content:
+                        application/json:
+                            schema:
+                                type: "array"
+                                items:
+                                    $ref: "#/components/schemas/SongItem"
+                400:
+                    description: "invalid input, object invalid"
+            x-swagger-router-controller: "Users"
+            x-amazon-apigateway-integration:
+                httpMethod: "POST"
+                uri: "arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-central-1:118101356080:function:GetSongsFunction/invocations"
+                responses:
+                    default:
+                        statusCode: "200"
+                passthroughBehavior: "when_no_match"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws_proxy"
+
+components:
+    schemas:
+        SongItem:
+            type: "object"
+            required:
+                - "dateAdded"
+                - "tags"
+                - "title"
+                - "url"
+            properties:
+                _id:
+                    type: "string"
+                    example: "5daef72831cae99923dad6ez"
+                title:
+                    type: "string"
+                    example: "G-Eazy - Far alone"
+                url:
+                    type: "string"
+                    example: "https://youtube.com/watch?v=sxV1_Lr1yf0"
+                dateAdded:
+                    type: "string"
+                    example: "Wed Oct 09 2019 13:39:18 GMT+0200 (Central European Summer Time)"
+                tags:
+                    type: "array"
+                    example:
+                        - "dance"
+                        - "party"
+                    items:
+                        type: "string"
+            example:
+                _id: "5daef72831cae99923dad6ez"
+                title: "G-Eazy - Far alone"
+                url: "https://youtube.com/watch?v=sxV1_Lr1yf0"
+                dateAdded: "Wed Oct 09 2019 13:39:18 GMT+0200 (Central European Summer Time)"
+                tags:
+                    - "dance"
+                    - "party"

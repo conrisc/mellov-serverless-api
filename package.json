@@ -1,14 +1,13 @@
 {
-    "name": "delete-test-01",
+    "name": "mellov-api",
     "description": "delete-test-01-description",
     "version": "0.0.1",
     "private": true,
+    "type": "module",
     "dependencies": {
-        "@aws-sdk/client-dynamodb": "^3.188.0",
-        "@aws-sdk/lib-dynamodb": "^3.188.0"
+        "mongodb": "^4.12.1"
     },
     "devDependencies": {
-        "aws-sdk-client-mock": "^2.0.0",
         "jest": "^29.2.1"
     },
     "scripts": {
@@ -27,4 +26,3 @@
         ]
     }
 }
-
