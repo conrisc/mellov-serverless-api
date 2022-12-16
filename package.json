@@ -5,6 +5,7 @@
     "private": true,
     "type": "module",
     "dependencies": {
+        "@aws-sdk/client-secrets-manager": "^3.231.0",
         "mongodb": "^4.12.1"
     },
     "devDependencies": {

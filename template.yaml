@@ -9,6 +9,21 @@ Parameters:
   DbClusterParameter:
     Type: String
     Default: 'what-appy-cluster.gsicl.mongodb.net/what'
+  DbCredentialsSecretNameParameter:
+    Type: String
+    Default: mellov/db
+  MellovClientUrlParameter:
+    Type: String
+    Default: http://localhost:8080
+  SpotifyClientIdSecretNameParameter:
+    Type: String
+    Default: mellov/spotify/clientId
+  SpotifyPasswordSecretNameParameter:
+    Type: String
+    Default: mellov/spotify/password
+  SpotifyRedirectUriParameter:
+    Type: String
+    Default: https://mellov-server.herokuapp.com/spotify/callback
 
 Resources:
   # DbClusterSsmParameter:
@@ -42,15 +57,19 @@ Resources:
       Description: Get songs
       Policies:
         - AWSLambdaBasicExecutionRole
+        - Statement:
+          - Effect: Allow
+            Action:
+              - secretsmanager:GetSecretValue
+            Resource: '*'
       Environment:
         Variables:
           DB_CLUSTER: !Ref DbClusterParameter
-          DB_PASSWORD: 'password'
-          DB_USERNAME: 'username'
-          MELLOV_CLIENT_URL: 'mellov_client'
-          SPOTIFY_CLIENT_ID:  'spotify_client'
-          SPOTIFY_REDIRECT_URI: 'spotify_redirect_uri'
-          SPOTIFY_SECRET: 'spotify_secret'
+          DB_CREDENTIALS_SECRET_NAME: !Ref DbCredentialsSecretNameParameter
+          MELLOV_CLIENT_URL: !Ref MellovClientUrlParameter
+          SPOTIFY_CLIENT_ID_SECRET_NAME: !Ref SpotifyClientIdSecretNameParameter
+          SPOTIFY_PASSWORD_SECRET_NAME: !Ref SpotifyPasswordSecretNameParameter
+          SPOTIFY_REDIRECT_URI: !Ref SpotifyRedirectUriParameter
       Events:
         GetSongsApi:
           Type: Api
