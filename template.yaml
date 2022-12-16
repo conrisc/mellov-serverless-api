@@ -25,6 +25,19 @@ Parameters:
     Type: String
     Default: https://mellov-server.herokuapp.com/spotify/callback
 
+Globals:
+  Function:
+    Runtime: nodejs18.x
+    Timeout: 60
+    MemorySize: 128
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        DB_CLUSTER: !Ref DbClusterParameter
+        DB_CREDENTIALS_SECRET_NAME: !Ref DbCredentialsSecretNameParameter
+        MELLOV_CLIENT_URL: !Ref MellovClientUrlParameter
+
 Resources:
   # DbClusterSsmParameter:
   #   Type: AWS::SSM::Parameter
@@ -49,24 +62,10 @@ Resources:
     Properties:
       FunctionName: GetSongsFunction
       Handler: src/handlers/get-songs.getSongsHandler
-      Runtime: nodejs18.x
-      Architectures:
-        - x86_64
-      MemorySize: 128
-      Timeout: 60
       Description: Get songs
-      Policies:
-        - AWSLambdaBasicExecutionRole
-        - Statement:
-          - Effect: Allow
-            Action:
-              - secretsmanager:GetSecretValue
-            Resource: '*'
+      Role: !GetAtt LambdaEndpointRole.Arn
       Environment:
         Variables:
-          DB_CLUSTER: !Ref DbClusterParameter
-          DB_CREDENTIALS_SECRET_NAME: !Ref DbCredentialsSecretNameParameter
-          MELLOV_CLIENT_URL: !Ref MellovClientUrlParameter
           SPOTIFY_CLIENT_ID_SECRET_NAME: !Ref SpotifyClientIdSecretNameParameter
           SPOTIFY_PASSWORD_SECRET_NAME: !Ref SpotifyPasswordSecretNameParameter
           SPOTIFY_REDIRECT_URI: !Ref SpotifyRedirectUriParameter
@@ -77,6 +76,32 @@ Resources:
             RestApiId: !Ref MellovApiGateway
             Path: /songs
             Method: GET
+
+  LambdaEndpointRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service:
+              - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        -
+          PolicyName: AccessSecretManager
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              -
+                Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: '*'
 
 Outputs:
   WebEndpoint:
