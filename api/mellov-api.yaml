@@ -1,4 +1,5 @@
 openapi: 3.0.0
+
 info:
     description: "Mellov API"
     version: 1.0.0
@@ -6,7 +7,7 @@ info:
     license:
         name: "Apache 2.0"
         url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-#basePath: "/api"
+
 tags:
     - name: "admins"
       description: "Secured Admin-only calls"
@@ -14,8 +15,7 @@ tags:
       description: "Operations available to regular developers"
     - name: "users"
       description: "Operations available to signed in users"
-#schemes:
-#    - "https"
+
 paths:
     /songs:
         get:
@@ -73,6 +73,9 @@ paths:
                                     $ref: "#/components/schemas/SongItem"
                 400:
                     description: "invalid input, object invalid"
+            security:
+                - MellovAuthorizer:
+                    - "aws.cognito.signin.user.admin"
             x-swagger-router-controller: "Users"
             x-amazon-apigateway-integration:
                 httpMethod: "POST"
@@ -85,6 +88,16 @@ paths:
                 type: "aws_proxy"
 
 components:
+    securitySchemes:
+        MellovAuthorizer:
+            type: "apiKey"
+            name: "Authorization"
+            in: "header"
+            x-amazon-apigateway-authtype: "cognito_user_pools"
+            x-amazon-apigateway-authorizer:
+                providerARNs:
+                - "arn:aws:cognito-idp:eu-central-1:118101356080:userpool/eu-central-1_6DPW3zDLR"
+                type: "cognito_user_pools"
     schemas:
         SongItem:
             type: "object"
