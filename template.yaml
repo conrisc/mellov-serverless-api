@@ -122,4 +122,4 @@ Resources:
 Outputs:
     WebEndpoint:
         Description: 'API Gateway endpoint URL for prod stage'
-        Value: !Sub 'https://${MellovApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod/'
+        Value: !Sub 'https://${MellovApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/'
