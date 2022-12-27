@@ -3,14 +3,14 @@ import { corsHeaders } from "../utils/cors-headers.util.mjs";
 
 export const getSongsHandler = async (event) => {
     if (event.httpMethod !== 'GET') {
-        throw new Error(`getSongsItemHandler only accept GET method, you tried: ${event.httpMethod}`);
+        throw new Error(`getSongsHandler only accept GET method, you tried: ${event.httpMethod}`);
     }
 
     console.info('received:', event);
     const collectionName = 'songs';
 
-    let { skip = 0, limit = 10, title = '', sort = '' } = event.queryStringParameters;
-    const { tags = [] } = event.multiValueQueryStringParameters;
+    let { skip = 0, limit = 10, title = '', sort = '' } = event.queryStringParameters || {};
+    const { tags = [] } = event.multiValueQueryStringParameters || {};
 
     skip = parseInt(skip);
     limit = parseInt(limit);

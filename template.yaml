@@ -1,110 +1,125 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  Serverless API for Mellov Application
+    Serverless API for Mellov Application
 
 Transform:
-- AWS::Serverless-2016-10-31
+    - AWS::Serverless-2016-10-31
 
 Parameters:
-  DbClusterParameter:
-    Type: String
-    Default: 'what-appy-cluster.gsicl.mongodb.net/what'
-  DbCredentialsSecretNameParameter:
-    Type: String
-    Default: mellov/db
-  MellovClientUrlParameter:
-    Type: String
-    Default: http://localhost:8080
-  SpotifyClientIdSecretNameParameter:
-    Type: String
-    Default: mellov/spotify/clientId
-  SpotifyPasswordSecretNameParameter:
-    Type: String
-    Default: mellov/spotify/password
-  SpotifyRedirectUriParameter:
-    Type: String
-    Default: https://mellov-server.herokuapp.com/spotify/callback
+    DbClusterParameter:
+        Type: String
+        Default: 'what-appy-cluster.gsicl.mongodb.net/what'
+    DbCredentialsSecretNameParameter:
+        Type: String
+        Default: mellov/db
+    MellovClientUrlParameter:
+        Type: String
+        Default: http://localhost:8080
+    SpotifyClientIdSecretNameParameter:
+        Type: String
+        Default: mellov/spotify/clientId
+    SpotifyPasswordSecretNameParameter:
+        Type: String
+        Default: mellov/spotify/password
+    SpotifyRedirectUriParameter:
+        Type: String
+        Default: https://mellov-server.herokuapp.com/spotify/callback
 
 Globals:
-  Function:
-    Runtime: nodejs18.x
-    Timeout: 60
-    MemorySize: 128
-    Architectures:
-      - x86_64
-    Environment:
-      Variables:
-        DB_CLUSTER: !Ref DbClusterParameter
-        DB_CREDENTIALS_SECRET_NAME: !Ref DbCredentialsSecretNameParameter
-        MELLOV_CLIENT_URL: !Ref MellovClientUrlParameter
+    Function:
+        Runtime: nodejs18.x
+        Timeout: 60
+        MemorySize: 128
+        Architectures:
+            - x86_64
+        Environment:
+            Variables:
+                DB_CLUSTER: !Ref DbClusterParameter
+                DB_CREDENTIALS_SECRET_NAME: !Ref DbCredentialsSecretNameParameter
+                MELLOV_CLIENT_URL: !Ref MellovClientUrlParameter
 
 Resources:
-  # DbClusterSsmParameter:
-  #   Type: AWS::SSM::Parameter
-  #   Properties:
-  #     Type: String
-  #     Name: /mellov/db/cluster
-  #     Value: 'some cluster'
+    # DbClusterSsmParameter:
+    #   Type: AWS::SSM::Parameter
+    #   Properties:
+    #     Type: String
+    #     Name: /mellov/db/cluster
+    #     Value: 'some cluster'
 
-  MellovApiGateway:
-    Type: AWS::Serverless::Api
-    Properties:
-      OpenApiVersion: 3.0.1
-      StageName: Prod
-      DefinitionUri: './api/mellov-api.yaml'
-      # DefinitionBody:
-        # 'Fn::Transform':
-          # Name: 'AWS::Include'
-          # Parameters:
-            # Location: './api/mellov-api.yaml'
+    MellovApiGateway:
+        Type: AWS::Serverless::Api
+        Properties:
+            OpenApiVersion: 3.0.1
+            StageName: Prod
+            DefinitionUri: './api/mellov-api.yaml'
+            # DefinitionBody:
+                # 'Fn::Transform':
+                # Name: 'AWS::Include'
+                # Parameters:
+                    # Location: './api/mellov-api.yaml'
 
-  GetSongsFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: GetSongsFunction
-      Handler: src/handlers/get-songs.getSongsHandler
-      Description: Get songs
-      Role: !GetAtt LambdaEndpointRole.Arn
-      Environment:
-        Variables:
-          SPOTIFY_CLIENT_ID_SECRET_NAME: !Ref SpotifyClientIdSecretNameParameter
-          SPOTIFY_PASSWORD_SECRET_NAME: !Ref SpotifyPasswordSecretNameParameter
-          SPOTIFY_REDIRECT_URI: !Ref SpotifyRedirectUriParameter
-      Events:
-        GetSongsApi:
-          Type: Api
-          Properties:
-            RestApiId: !Ref MellovApiGateway
-            Path: /songs
-            Method: GET
+    GetSongsFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: GetSongsFunction
+            Handler: src/handlers/get-songs.getSongsHandler
+            Description: Get songs
+            Role: !GetAtt LambdaEndpointRole.Arn
+            Environment:
+                Variables:
+                    SPOTIFY_CLIENT_ID_SECRET_NAME: !Ref SpotifyClientIdSecretNameParameter
+                    SPOTIFY_PASSWORD_SECRET_NAME: !Ref SpotifyPasswordSecretNameParameter
+                    SPOTIFY_REDIRECT_URI: !Ref SpotifyRedirectUriParameter
+            Events:
+                GetSongsApi:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref MellovApiGateway
+                        Path: /songs
+                        Method: GET
 
-  LambdaEndpointRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          -
-            Effect: Allow
-            Principal:
-              Service:
-              - lambda.amazonaws.com
-            Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-      Policies:
-        -
-          PolicyName: AccessSecretManager
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              -
-                Effect: Allow
-                Action:
-                  - secretsmanager:GetSecretValue
-                Resource: '*'
+    GetTagsFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: GetTagsFunction
+            Handler: src/handlers/get-tags.getTagsHandler
+            Description: Get tags
+            Role: !GetAtt LambdaEndpointRole.Arn
+            Events:
+                GetTagsApi:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref MellovApiGateway
+                        Path: /tags
+                        Method: GET
+
+    LambdaEndpointRole:
+        Type: AWS::IAM::Role
+        Properties:
+            AssumeRolePolicyDocument:
+                Version: '2012-10-17'
+                Statement:
+                    -
+                        Effect: Allow
+                        Principal:
+                            Service:
+                                - lambda.amazonaws.com
+                        Action: sts:AssumeRole
+            ManagedPolicyArns:
+                - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+            Policies:
+                -
+                    PolicyName: AccessSecretManager
+                    PolicyDocument:
+                        Version: '2012-10-17'
+                        Statement:
+                            -
+                                Effect: Allow
+                                Action:
+                                    - secretsmanager:GetSecretValue
+                                Resource: '*'
 
 Outputs:
-  WebEndpoint:
-    Description: "API Gateway endpoint URL for prod stage"
-    Value: !Sub "https://${MellovApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod/"
+    WebEndpoint:
+        Description: 'API Gateway endpoint URL for prod stage'
+        Value: !Sub 'https://${MellovApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod/'
