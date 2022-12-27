@@ -9,37 +9,43 @@ export const getSongsHandler = async (event) => {
     console.info('received:', event);
     const collectionName = 'songs';
 
+    let { skip = 0, limit = 10, title = '', sort = '' } = event.queryStringParameters;
+    const { tags = [] } = event.multiValueQueryStringParameters;
+
+    skip = parseInt(skip);
+    limit = parseInt(limit);
+    const query = {};
+    if (title) query.title = { $regex: title, $options: 'i' };
+    if (tags && tags.length > 0) query.tags = { $in: tags };
+
+    const sortSetting = {};
+    switch (sort) {
+        case 'title_asc':
+            sortSetting.title = 1;
+            break;
+        case 'title_desc':
+            sortSetting.title = -1;
+            break;
+        case 'added_date_asc':
+            sortSetting.dateAdded = 1;
+            break;
+        case 'added_date_desc':
+            sortSetting.dateAdded = -1;
+            break;
+        default:
+            console.warn(`Unknown sort option ${sort}`);
+            break;
+    }
+
     let results = [];
-    const skip = 0;
-    const limit = 10;
-    const data = {};
-    // if (id) data._id = new ObjectId(id);
-    // if (title) data.title = { $regex: title, $options: 'i' };
-    // if (tags && tags.length > 0) data.tags = { $in: tags };
-
-    const sortData = {};
-    // switch(sort) {
-    //     case 'title_asc':
-    //         sortData.title = 1;
-    //         break;
-    //     case 'title_desc':
-    //         sortData.title = -1;
-    //         break;
-    //     case 'addedDate_asc':
-    //         sortData.dateAdded = 1;
-    //         break;
-    //     case 'addedDate_desc':
-    //         sortData.dateAdded = -1;
-    //         break;
-    // }
-
     try {
         const db = await getDB();
         const collection = db.collection(collectionName);
-        // if (sort !== 'random')
-        results = await collection.find(data).sort(sortData).skip(skip).limit(limit).toArray();
-        // else
-        //     collection.aggregate([{ $match: data }, { $sample: {size: limit} }]).toArray(log);
+        if (sort !== 'random')
+            results = await collection.find(query).sort(sortSetting).skip(skip).limit(limit).toArray();
+        else
+            collection.aggregate([{ $match: data }, { $sample: {size: limit} }]).toArray(log);
+
         console.log(`Found ${results.length} songs`);
     } catch (error) {
         console.error(`Failed to get songs from database: ${error}`);
