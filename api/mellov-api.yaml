@@ -18,6 +18,43 @@ tags:
 
 paths:
     /songs:
+        options:
+            summary: CORS support
+            description: |
+                Enable CORS by returning correct headers
+            tags:
+                - CORS
+            responses:
+                200:
+                    description: Default response for CORS method
+                    headers:
+                        Access-Control-Allow-Origin:
+                            schema:
+                                type: string
+                        Access-Control-Allow-Methods:
+                            schema:
+                                type: string
+                        Access-Control-Allow-Headers:
+                            schema:
+                                type: string
+                    content: {}
+            x-amazon-apigateway-integration:
+                type: mock
+                requestTemplates:
+                    application/json: |
+                        {
+                            "statusCode" : 200
+                        }
+                responses:
+                    default:
+                        statusCode: "200"
+                        responseParameters:
+                            method.response.header.Access-Control-Allow-Headers: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key'''
+                            method.response.header.Access-Control-Allow-Methods: '''*'''
+                            method.response.header.Access-Control-Allow-Origin: '''*'''
+                        responseTemplates:
+                            application/json: |
+                                {}
         get:
             tags:
                 - "users"
@@ -65,6 +102,16 @@ paths:
             responses:
                 200:
                     description: "search result matching criteria"
+                    headers:
+                        Access-Control-Allow-Origin:
+                            schema:
+                                type: string
+                        Access-Control-Allow-Methods:
+                            schema:
+                                type: string
+                        Access-Control-Allow-Headers:
+                            schema:
+                                type: string
                     content:
                         application/json:
                             schema:
@@ -83,6 +130,13 @@ paths:
                 responses:
                     default:
                         statusCode: "200"
+                        responseParameters:
+                            method.response.header.Access-Control-Allow-Headers: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key'''
+                            method.response.header.Access-Control-Allow-Methods: '''*'''
+                            method.response.header.Access-Control-Allow-Origin: '''*'''
+                        responseTemplates:
+                            application/json: |
+                                {}
                 passthroughBehavior: "when_no_match"
                 contentHandling: "CONVERT_TO_TEXT"
                 type: "aws_proxy"
@@ -118,7 +172,7 @@ components:
                     example: "https://youtube.com/watch?v=sxV1_Lr1yf0"
                 dateAdded:
                     type: "string"
-                    example: "Wed Oct 09 2019 13:39:18 GMT+0200 (Central European Summer Time)"
+                    example: "2013-12-06T00:25:26Z"
                 tags:
                     type: "array"
                     example:
@@ -130,7 +184,7 @@ components:
                 _id: "5daef72831cae99923dad6ez"
                 title: "G-Eazy - Far alone"
                 url: "https://youtube.com/watch?v=sxV1_Lr1yf0"
-                dateAdded: "Wed Oct 09 2019 13:39:18 GMT+0200 (Central European Summer Time)"
+                dateAdded: "2013-12-06T00:25:26Z"
                 tags:
                     - "dance"
                     - "party"

@@ -1,4 +1,5 @@
 import { getDB } from "../services/database.service.mjs";
+import { corsHeaders } from "../utils/cors-headers.util.mjs";
 
 export const getSongsHandler = async (event) => {
     if (event.httpMethod !== 'GET') {
@@ -46,7 +47,8 @@ export const getSongsHandler = async (event) => {
 
     const response = {
         statusCode: 200,
-        body: JSON.stringify({ items: results })
+        headers: corsHeaders(),
+        body: JSON.stringify(results)
     };
 
     console.info(`response from: ${event.path} statusCode: ${response.statusCode} body: ${response.body}`);
