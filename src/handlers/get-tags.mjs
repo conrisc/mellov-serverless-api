@@ -1,4 +1,5 @@
 import { getDB } from "../services/database.service.mjs";
+import { translateTagItemDto } from "../translators/tag-item.mjs";
 import { corsHeaders } from "../utils/cors-headers.util.mjs";
 
 export const getTagsHandler = async (event) => {
@@ -13,16 +14,17 @@ export const getTagsHandler = async (event) => {
     skip = parseInt(skip);
     limit = parseInt(limit);
 
-    let results = [];
+    let dtoResults = [];
     try {
         const db = await getDB();
         const collection = db.collection(collectionName);
-        results = await collection.find({}).skip(skip).limit(limit).toArray();
-        console.log(`Found ${results.length} tags`);
+        dtoResults = await collection.find({}).skip(skip).limit(limit).toArray();
+        console.log(`Found ${dtoResults.length} tags`);
     } catch (error) {
         console.error(`Failed to get tags from database: ${error}`);
     }
 
+    const results = dtoResults.map(translateTagItemDto);
     const response = {
         statusCode: 200,
         headers: corsHeaders(),

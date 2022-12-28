@@ -271,7 +271,7 @@ components:
                 - "title"
                 - "url"
             properties:
-                _id:
+                id:
                     type: "string"
                     example: "5daef72831cae99923dad6ez"
                 title:
@@ -291,7 +291,7 @@ components:
                     items:
                         type: "string"
             example:
-                _id: "5daef72831cae99923dad6ez"
+                id: "5daef72831cae99923dad6ez"
                 title: "G-Eazy - Far alone"
                 url: "https://youtube.com/watch?v=sxV1_Lr1yf0"
                 dateAdded: "2013-12-06T00:25:26Z"
@@ -303,12 +303,12 @@ components:
             required:
                 - "name"
             properties:
-                _id:
+                id:
                     type: "string"
                     example: "5daef72831cae99923dad6ez"
                 name:
                     type: "string"
                     example: "Dance"
             example:
+                id: "5daef72831cae99923dad6ez"
                 name: "Dance"
-                _id: "5daef72831cae99923dad6ez"

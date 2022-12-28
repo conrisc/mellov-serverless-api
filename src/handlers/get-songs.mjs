@@ -1,4 +1,5 @@
 import { getDB } from "../services/database.service.mjs";
+import { translateSongItemDto } from "../translators/song-item.mjs";
 import { corsHeaders } from "../utils/cors-headers.util.mjs";
 
 export const getSongsHandler = async (event) => {
@@ -37,20 +38,21 @@ export const getSongsHandler = async (event) => {
             break;
     }
 
-    let results = [];
+    let dtoResults = [];
     try {
         const db = await getDB();
         const collection = db.collection(collectionName);
         if (sort !== 'random')
-            results = await collection.find(query).sort(sortSetting).skip(skip).limit(limit).toArray();
+            dtoResults = await collection.find(query).sort(sortSetting).skip(skip).limit(limit).toArray();
         else
-            collection.aggregate([{ $match: data }, { $sample: {size: limit} }]).toArray(log);
+            dtoResults = await collection.aggregate([{ $match: query }, { $sample: { size: limit } }]).toArray();
 
-        console.log(`Found ${results.length} songs`);
+        console.log(`Found ${dtoResults.length} songs`);
     } catch (error) {
         console.error(`Failed to get songs from database: ${error}`);
     }
 
+    const results = dtoResults.map(translateSongItemDto);
     const response = {
         statusCode: 200,
         headers: corsHeaders(),
