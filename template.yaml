@@ -93,6 +93,22 @@ Resources:
                         Path: /tags
                         Method: GET
 
+    GetYtItemsFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: GetYtItemsFunction
+            Handler: src/handlers/get-yt-items.getYtItemsHandler
+            Description: Get yt items
+            Role: !GetAtt LambdaEndpointRole.Arn
+            Events:
+                GetYtItemsApi:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref MellovApiGateway
+                        Path: /yt-items
+                        Method: GET
+
+
     LambdaEndpointRole:
         Type: AWS::IAM::Role
         Properties:

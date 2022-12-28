@@ -250,6 +250,109 @@ paths:
                 passthroughBehavior: "when_no_match"
                 contentHandling: "CONVERT_TO_TEXT"
                 type: "aws_proxy"
+    /yt-items:
+        options:
+            summary: CORS support
+            description: |
+                Enable CORS by returning correct headers
+            tags:
+                - CORS
+            responses:
+                200:
+                    description: Default response for CORS method
+                    headers:
+                        Access-Control-Allow-Origin:
+                            schema:
+                                type: string
+                        Access-Control-Allow-Methods:
+                            schema:
+                                type: string
+                        Access-Control-Allow-Headers:
+                            schema:
+                                type: string
+                    content: {}
+            x-amazon-apigateway-integration:
+                type: mock
+                requestTemplates:
+                    application/json: |
+                        {
+                            "statusCode" : 200
+                        }
+                responses:
+                    default:
+                        statusCode: "200"
+                        responseParameters:
+                            method.response.header.Access-Control-Allow-Headers: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key'''
+                            method.response.header.Access-Control-Allow-Methods: '''*'''
+                            method.response.header.Access-Control-Allow-Origin: '''*'''
+                        responseTemplates:
+                            application/json: |
+                                {}
+        get:
+            tags:
+                - "users"
+            summary: "Search yt items"
+            description: "Find yt items"
+            operationId: "searchYtItems"
+            parameters:
+                -
+                    name: "title"
+                    in: "query"
+                    description: "title to search"
+                    required: true
+                    schema:
+                        type: "string"
+                -
+                    name: "limit"
+                    in: "query"
+                    description: "maximum number of records to return"
+                    required: false
+                    schema:
+                        type: "integer"
+                        maximum: 300
+                        minimum: 0
+                        format: "int32"
+            responses:
+                200:
+                    description: "search result matching criteria"
+                    headers:
+                        Access-Control-Allow-Origin:
+                            schema:
+                                type: string
+                        Access-Control-Allow-Methods:
+                            schema:
+                                type: string
+                        Access-Control-Allow-Headers:
+                            schema:
+                                type: string
+                    content:
+                        application/json:
+                            schema:
+                                type: "array"
+                                items:
+                                    $ref: "#/components/schemas/YtVideoItem"
+                400:
+                    description: "invalid input, object invalid"
+            security:
+                - MellovAuthorizer:
+                    - "aws.cognito.signin.user.admin"
+            x-swagger-router-controller: "Users"
+            x-amazon-apigateway-integration:
+                httpMethod: "POST"
+                uri: "arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-central-1:118101356080:function:GetYtItemsFunction/invocations"
+                responses:
+                    default:
+                        statusCode: "200"
+                        responseParameters:
+                            method.response.header.Access-Control-Allow-Headers: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key'''
+                            method.response.header.Access-Control-Allow-Methods: '''*'''
+                            method.response.header.Access-Control-Allow-Origin: '''*'''
+                        responseTemplates:
+                            application/json: |
+                                {}
+                passthroughBehavior: "when_no_match"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws_proxy"
 
 components:
     securitySchemes:
@@ -312,3 +415,19 @@ components:
             example:
                 id: "5daef72831cae99923dad6ez"
                 name: "Dance"
+        YtVideoItem:
+            type: "object"
+            properties:
+                title:
+                    type: "string"
+                    example: "LP - Muddy Waters"
+                videoId:
+                    type: "string"
+                    example: "Ss8t7a8n0U4"
+                thumbnailUrl:
+                    type: "string"
+                    example: "https://i.ytimg.com/vi/Ss8t7a8n0U4/default.jpg"
+            example:
+                videoId: "Ss8t7a8n0U4"
+                title: "LP - Muddy Waters"
+                thumbnailUrl: "https://i.ytimg.com/vi/Ss8t7a8n0U4/default.jpg"
