@@ -58,6 +58,21 @@ Resources:
                 # Parameters:
                     # Location: './api/mellov-api.yaml'
 
+    GetNotesFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: GetNotesFunction
+            Handler: src/handlers/get-notes.getNotesHandler
+            Description: Get notes
+            Role: !GetAtt LambdaEndpointRole.Arn
+            Events:
+                GetTagsApi:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref MellovApiGateway
+                        Path: /notes
+                        Method: GET
+
     GetSongsFunction:
         Type: AWS::Serverless::Function
         Properties:
@@ -107,7 +122,6 @@ Resources:
                         RestApiId: !Ref MellovApiGateway
                         Path: /yt-items
                         Method: GET
-
 
     LambdaEndpointRole:
         Type: AWS::IAM::Role

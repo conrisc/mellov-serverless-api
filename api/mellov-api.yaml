@@ -17,6 +17,111 @@ tags:
       description: "Operations available to signed in users"
 
 paths:
+    /notes:
+        options:
+            summary: CORS support
+            description: |
+                Enable CORS by returning correct headers
+            tags:
+                - CORS
+            responses:
+                200:
+                    description: Default response for CORS method
+                    headers:
+                        Access-Control-Allow-Origin:
+                            schema:
+                                type: string
+                        Access-Control-Allow-Methods:
+                            schema:
+                                type: string
+                        Access-Control-Allow-Headers:
+                            schema:
+                                type: string
+                    content: {}
+            x-amazon-apigateway-integration:
+                type: mock
+                requestTemplates:
+                    application/json: |
+                        {
+                            "statusCode" : 200
+                        }
+                responses:
+                    default:
+                        statusCode: "200"
+                        responseParameters:
+                            method.response.header.Access-Control-Allow-Headers: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key'''
+                            method.response.header.Access-Control-Allow-Methods: '''*'''
+                            method.response.header.Access-Control-Allow-Origin: '''*'''
+                        responseTemplates:
+                            application/json: |
+                                {}
+        get:
+            tags:
+                - "users"
+            summary: "Search notes"
+            description: "Find notes"
+            operationId: "searchNotes"
+            parameters:
+                -
+                    name: "skip"
+                    in: "query"
+                    description: "number of records to skip for pagination"
+                    required: false
+                    schema:
+                        type: "integer"
+                        minimum: 0
+                        format: "int32"
+                -
+                    name: "limit"
+                    in: "query"
+                    description: "maximum number of records to return"
+                    required: false
+                    schema:
+                        type: "integer"
+                        maximum: 300
+                        minimum: 0
+                        format: "int32"
+            responses:
+                200:
+                    description: "search result matching criteria"
+                    headers:
+                        Access-Control-Allow-Origin:
+                            schema:
+                                type: string
+                        Access-Control-Allow-Methods:
+                            schema:
+                                type: string
+                        Access-Control-Allow-Headers:
+                            schema:
+                                type: string
+                    content:
+                        application/json:
+                            schema:
+                                type: "array"
+                                items:
+                                    $ref: "#/components/schemas/NoteItem"
+                400:
+                    description: "invalid input, object invalid"
+            security:
+                - MellovAuthorizer:
+                    - "aws.cognito.signin.user.admin"
+            x-swagger-router-controller: "Users"
+            x-amazon-apigateway-integration:
+                httpMethod: "POST"
+                uri: "arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-central-1:118101356080:function:GetNotesFunction/invocations"
+                responses:
+                    default:
+                        statusCode: "200"
+                        responseParameters:
+                            method.response.header.Access-Control-Allow-Headers: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key'''
+                            method.response.header.Access-Control-Allow-Methods: '''*'''
+                            method.response.header.Access-Control-Allow-Origin: '''*'''
+                        responseTemplates:
+                            application/json: |
+                                {}
+                passthroughBehavior: "when_no_match"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws_proxy"
     /songs:
         options:
             summary: CORS support
@@ -366,6 +471,25 @@ components:
                     - "arn:aws:cognito-idp:eu-central-1:118101356080:userpool/eu-central-1_6DPW3zDLR"
                 type: "cognito_user_pools"
     schemas:
+        NoteItem:
+            type: "object"
+            required:
+                - "creationDate"
+                - "text"
+            properties:
+                id:
+                    type: "string"
+                    example: "4daef72846cae99923dfd6ez"
+                creationDate:
+                    type: "string"
+                    example: "2014-01-02T12:48:00Z"
+                text:
+                    type: "string"
+                    example: "Example text"
+            example:
+                id: "4daef72846cae99923dfd6ez"
+                text: "Example Text"
+                creationDate: "2014-01-02T12:48:00Z"
         SongItem:
             type: "object"
             required:
