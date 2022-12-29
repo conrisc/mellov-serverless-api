@@ -122,6 +122,105 @@ paths:
                 passthroughBehavior: "when_no_match"
                 contentHandling: "CONVERT_TO_TEXT"
                 type: "aws_proxy"
+    /notes/{noteId}:
+        options:
+            summary: CORS support
+            description: |
+                Enable CORS by returning correct headers
+            tags:
+                - CORS
+            parameters:
+                -
+                    name: "noteId"
+                    in: "path"
+                    description: "The note Id"
+                    required: true
+                    schema:
+                        type: "string"
+            responses:
+                200:
+                    description: Default response for CORS method
+                    headers:
+                        Access-Control-Allow-Origin:
+                            schema:
+                                type: string
+                        Access-Control-Allow-Methods:
+                            schema:
+                                type: string
+                        Access-Control-Allow-Headers:
+                            schema:
+                                type: string
+                    content: {}
+            x-amazon-apigateway-integration:
+                type: mock
+                requestTemplates:
+                    application/json: |
+                        {
+                            "statusCode" : 200
+                        }
+                responses:
+                    default:
+                        statusCode: "200"
+                        responseParameters:
+                            method.response.header.Access-Control-Allow-Headers: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key'''
+                            method.response.header.Access-Control-Allow-Methods: '''*'''
+                            method.response.header.Access-Control-Allow-Origin: '''*'''
+                        responseTemplates:
+                            application/json: |
+                                {}
+        get:
+            tags:
+                - "users"
+            summary: "Search note"
+            description: "Find note"
+            operationId: "searchNote"
+            parameters:
+                -
+                    name: "noteId"
+                    in: "path"
+                    description: "The note Id"
+                    required: true
+                    schema:
+                        type: "string"
+            responses:
+                200:
+                    description: "search result matching criteria"
+                    headers:
+                        Access-Control-Allow-Origin:
+                            schema:
+                                type: string
+                        Access-Control-Allow-Methods:
+                            schema:
+                                type: string
+                        Access-Control-Allow-Headers:
+                            schema:
+                                type: string
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/NoteItem"
+                400:
+                    description: "invalid input, object invalid"
+            security:
+                - MellovAuthorizer:
+                    - "aws.cognito.signin.user.admin"
+            x-swagger-router-controller: "Users"
+            x-amazon-apigateway-integration:
+                httpMethod: "POST"
+                uri: "arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-central-1:118101356080:function:GetNoteFunction/invocations"
+                responses:
+                    default:
+                        statusCode: "200"
+                        responseParameters:
+                            method.response.header.Access-Control-Allow-Headers: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key'''
+                            method.response.header.Access-Control-Allow-Methods: '''*'''
+                            method.response.header.Access-Control-Allow-Origin: '''*'''
+                        responseTemplates:
+                            application/json: |
+                                {}
+                passthroughBehavior: "when_no_match"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws_proxy"
     /songs:
         options:
             summary: CORS support

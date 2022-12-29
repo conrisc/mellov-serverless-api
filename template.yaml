@@ -73,6 +73,21 @@ Resources:
                         Path: /notes
                         Method: GET
 
+    GetNoteFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: GetNoteFunction
+            Handler: src/handlers/get-note.getNoteHandler
+            Description: Get note
+            Role: !GetAtt LambdaEndpointRole.Arn
+            Events:
+                GetTagsApi:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref MellovApiGateway
+                        Path: /notes/{noteId}
+                        Method: GET
+
     GetSongsFunction:
         Type: AWS::Serverless::Function
         Properties:
