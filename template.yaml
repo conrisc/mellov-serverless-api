@@ -78,7 +78,7 @@ Resources:
         Properties:
             FunctionName: AddNoteFunction
             Handler: src/handlers/add-note.addNoteHandler
-            Description: Get note
+            Description: Add note
             Role: !GetAtt LambdaEndpointRole.Arn
             Events:
                 MellovApi:
@@ -102,6 +102,21 @@ Resources:
                         RestApiId: !Ref MellovApiGateway
                         Path: /notes/{noteId}
                         Method: PUT
+
+    DeleteNoteFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: DeleteNoteFunction
+            Handler: src/handlers/delete-note.deleteNoteHandler
+            Description: Delete note
+            Role: !GetAtt LambdaEndpointRole.Arn
+            Events:
+                MellovApi:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref MellovApiGateway
+                        Path: /notes/{noteId}
+                        Method: DELETE
 
     GetNoteFunction:
         Type: AWS::Serverless::Function
