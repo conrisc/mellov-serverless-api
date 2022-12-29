@@ -66,12 +66,27 @@ Resources:
             Description: Get notes
             Role: !GetAtt LambdaEndpointRole.Arn
             Events:
-                GetTagsApi:
+                MellovApi:
                     Type: Api
                     Properties:
                         RestApiId: !Ref MellovApiGateway
                         Path: /notes
                         Method: GET
+
+    AddNoteFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: AddNoteFunction
+            Handler: src/handlers/add-note.addNoteHandler
+            Description: Get note
+            Role: !GetAtt LambdaEndpointRole.Arn
+            Events:
+                MellovApi:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref MellovApiGateway
+                        Path: /notes
+                        Method: POST
 
     GetNoteFunction:
         Type: AWS::Serverless::Function
@@ -81,7 +96,7 @@ Resources:
             Description: Get note
             Role: !GetAtt LambdaEndpointRole.Arn
             Events:
-                GetTagsApi:
+                MellovApi:
                     Type: Api
                     Properties:
                         RestApiId: !Ref MellovApiGateway
@@ -101,7 +116,7 @@ Resources:
                     SPOTIFY_PASSWORD_SECRET_NAME: !Ref SpotifyPasswordSecretNameParameter
                     SPOTIFY_REDIRECT_URI: !Ref SpotifyRedirectUriParameter
             Events:
-                GetSongsApi:
+                MellovApi:
                     Type: Api
                     Properties:
                         RestApiId: !Ref MellovApiGateway
@@ -116,7 +131,7 @@ Resources:
             Description: Get tags
             Role: !GetAtt LambdaEndpointRole.Arn
             Events:
-                GetTagsApi:
+                MellovApi:
                     Type: Api
                     Properties:
                         RestApiId: !Ref MellovApiGateway
@@ -131,7 +146,7 @@ Resources:
             Description: Get yt items
             Role: !GetAtt LambdaEndpointRole.Arn
             Events:
-                GetYtItemsApi:
+                MellovApi:
                     Type: Api
                     Properties:
                         RestApiId: !Ref MellovApiGateway

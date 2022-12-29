@@ -62,25 +62,8 @@ paths:
             description: "Find notes"
             operationId: "searchNotes"
             parameters:
-                -
-                    name: "skip"
-                    in: "query"
-                    description: "number of records to skip for pagination"
-                    required: false
-                    schema:
-                        type: "integer"
-                        minimum: 0
-                        format: "int32"
-                -
-                    name: "limit"
-                    in: "query"
-                    description: "maximum number of records to return"
-                    required: false
-                    schema:
-                        type: "integer"
-                        maximum: 300
-                        minimum: 0
-                        format: "int32"
+                - $ref: '#/components/parameters/skip'
+                - $ref: '#/components/parameters/limit'
             responses:
                 200:
                     description: "search result matching criteria"
@@ -109,6 +92,60 @@ paths:
             x-amazon-apigateway-integration:
                 httpMethod: "POST"
                 uri: "arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-central-1:118101356080:function:GetNotesFunction/invocations"
+                responses:
+                    default:
+                        statusCode: "200"
+                        responseParameters:
+                            method.response.header.Access-Control-Allow-Headers: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key'''
+                            method.response.header.Access-Control-Allow-Methods: '''*'''
+                            method.response.header.Access-Control-Allow-Origin: '''*'''
+                        responseTemplates:
+                            application/json: |
+                                {}
+                passthroughBehavior: "when_no_match"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws_proxy"
+        post:
+            tags:
+                - "users"
+            summary: "Add note"
+            description: "Add note"
+            operationId: "addNote"
+            requestBody:
+                description: "Note to add"
+                required: true
+                content:
+                    'application/json':
+                        schema:
+                            $ref: "#/components/schemas/NoteItem"
+            responses:
+                201:
+                    description: "item added"
+                    headers:
+                        Access-Control-Allow-Origin:
+                            schema:
+                                type: string
+                        Access-Control-Allow-Methods:
+                            schema:
+                                type: string
+                        Access-Control-Allow-Headers:
+                            schema:
+                                type: string
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ItemId"
+                400:
+                    description: "invalid input, object invalid"
+                409:
+                    description: "an existing item already exists"
+            security:
+                - MellovAuthorizer:
+                    - "aws.cognito.signin.user.admin"
+            x-swagger-router-controller: "Users"
+            x-amazon-apigateway-integration:
+                httpMethod: "POST"
+                uri: "arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-central-1:118101356080:function:AddNoteFunction/invocations"
                 responses:
                     default:
                         statusCode: "200"
@@ -266,25 +303,8 @@ paths:
             description: "Find songs"
             operationId: "searchSongs"
             parameters:
-                -
-                    name: "skip"
-                    in: "query"
-                    description: "number of records to skip for pagination"
-                    required: false
-                    schema:
-                        type: "integer"
-                        minimum: 0
-                        format: "int32"
-                -
-                    name: "limit"
-                    in: "query"
-                    description: "maximum number of records to return"
-                    required: false
-                    schema:
-                        type: "integer"
-                        maximum: 300
-                        minimum: 0
-                        format: "int32"
+                - $ref: '#/components/parameters/skip'
+                - $ref: '#/components/parameters/limit'
                 -
                     name: "title"
                     in: "query"
@@ -394,25 +414,8 @@ paths:
             description: "Find tags"
             operationId: "searchTags"
             parameters:
-                -
-                    name: "skip"
-                    in: "query"
-                    description: "number of records to skip for pagination"
-                    required: false
-                    schema:
-                        type: "integer"
-                        minimum: 0
-                        format: "int32"
-                -
-                    name: "limit"
-                    in: "query"
-                    description: "maximum number of records to return"
-                    required: false
-                    schema:
-                        type: "integer"
-                        maximum: 300
-                        minimum: 0
-                        format: "int32"
+                - $ref: '#/components/parameters/skip'
+                - $ref: '#/components/parameters/limit'
             responses:
                 200:
                     description: "search result matching criteria"
@@ -499,6 +502,7 @@ paths:
             description: "Find yt items"
             operationId: "searchYtItems"
             parameters:
+                - $ref: '#/components/parameters/limit'
                 -
                     name: "title"
                     in: "query"
@@ -506,16 +510,6 @@ paths:
                     required: true
                     schema:
                         type: "string"
-                -
-                    name: "limit"
-                    in: "query"
-                    description: "maximum number of records to return"
-                    required: false
-                    schema:
-                        type: "integer"
-                        maximum: 300
-                        minimum: 0
-                        format: "int32"
             responses:
                 200:
                     description: "search result matching criteria"
@@ -569,7 +563,30 @@ components:
                 providerARNs:
                     - "arn:aws:cognito-idp:eu-central-1:118101356080:userpool/eu-central-1_6DPW3zDLR"
                 type: "cognito_user_pools"
+    parameters:
+        limit:
+            name: limit
+            in: query
+            description: "maximum number of records to return"
+            required: false
+            schema:
+                type: "integer"
+                maximum: 300
+                minimum: 0
+                format: "int32"
+        skip:
+            name: "skip"
+            in: "query"
+            description: "number of records to skip for pagination"
+            required: false
+            schema:
+                type: "integer"
+                minimum: 0
+                format: "int32"
     schemas:
+        ItemId:
+            type: string
+            example: "5ddd3f95ee07e600231e9a4c"
         NoteItem:
             type: "object"
             required:
