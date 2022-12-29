@@ -258,6 +258,62 @@ paths:
                 passthroughBehavior: "when_no_match"
                 contentHandling: "CONVERT_TO_TEXT"
                 type: "aws_proxy"
+        put:
+            tags:
+                - "users"
+            summary: "Update note"
+            description: "Update note"
+            operationId: "updateNote"
+            parameters:
+                -
+                    name: "noteId"
+                    in: "path"
+                    description: "The note Id"
+                    required: true
+                    schema:
+                        type: "string"
+            requestBody:
+                description: "Note to add"
+                required: true
+                content:
+                    'application/json':
+                        schema:
+                            $ref: "#/components/schemas/NoteItem"
+            responses:
+                204:
+                    description: "item updated"
+                    headers:
+                        Access-Control-Allow-Origin:
+                            schema:
+                                type: string
+                        Access-Control-Allow-Methods:
+                            schema:
+                                type: string
+                        Access-Control-Allow-Headers:
+                            schema:
+                                type: string
+                400:
+                    description: "invalid input, object invalid"
+            security:
+                - MellovAuthorizer:
+                    - "aws.cognito.signin.user.admin"
+            x-swagger-router-controller: "Users"
+            x-amazon-apigateway-integration:
+                httpMethod: "POST"
+                uri: "arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-central-1:118101356080:function:UpdateNoteFunction/invocations"
+                responses:
+                    default:
+                        statusCode: "200"
+                        responseParameters:
+                            method.response.header.Access-Control-Allow-Headers: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key'''
+                            method.response.header.Access-Control-Allow-Methods: '''*'''
+                            method.response.header.Access-Control-Allow-Origin: '''*'''
+                        responseTemplates:
+                            application/json: |
+                                {}
+                passthroughBehavior: "when_no_match"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws_proxy"
     /songs:
         options:
             summary: CORS support

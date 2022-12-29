@@ -88,6 +88,21 @@ Resources:
                         Path: /notes
                         Method: POST
 
+    UpdateNoteFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: UpdateNoteFunction
+            Handler: src/handlers/update-note.updateNoteHandler
+            Description: Update note
+            Role: !GetAtt LambdaEndpointRole.Arn
+            Events:
+                MellovApi:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref MellovApiGateway
+                        Path: /notes/{noteId}
+                        Method: PUT
+
     GetNoteFunction:
         Type: AWS::Serverless::Function
         Properties:
