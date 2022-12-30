@@ -168,6 +168,20 @@ Resources:
                         Path: /songs
                         Method: POST
 
+    UpdateSongFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: UpdateSongFunction
+            Handler: src/handlers/update-song.updateSongHandler
+            Description: Update song
+            Role: !GetAtt LambdaEndpointRole.Arn
+            Events:
+                MellovApi:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref MellovApiGateway
+                        Path: /songs/{songId}
+                        Method: PUT
 
     GetTagsFunction:
         Type: AWS::Serverless::Function

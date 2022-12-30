@@ -10,7 +10,6 @@ export const updateNoteHandler = async (event) => {
     console.info('received:', event);
     const collectionName = 'notes';
 
-
     let { noteId } = event.pathParameters || {};
     let response;
     let noteItem;
@@ -28,7 +27,6 @@ export const updateNoteHandler = async (event) => {
 
     if (noteItem.id !== noteId)
         console.warn(`Path parameter nodeId=${noteId} is not equal to the noteId=${noteItem.id} in the request's body`);
-
 
     if (noteId && noteItem) {
         try {
