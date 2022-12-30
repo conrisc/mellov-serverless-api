@@ -134,7 +134,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/ItemId"
+                                $ref: "#/components/schemas/ItemCreated"
                 400:
                     description: "invalid input, object invalid"
                 409:
@@ -146,16 +146,6 @@ paths:
             x-amazon-apigateway-integration:
                 httpMethod: "POST"
                 uri: "arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-central-1:118101356080:function:AddNoteFunction/invocations"
-                responses:
-                    default:
-                        statusCode: "200"
-                        responseParameters:
-                            method.response.header.Access-Control-Allow-Headers: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key'''
-                            method.response.header.Access-Control-Allow-Methods: '''*'''
-                            method.response.header.Access-Control-Allow-Origin: '''*'''
-                        responseTemplates:
-                            application/json: |
-                                {}
                 passthroughBehavior: "when_no_match"
                 contentHandling: "CONVERT_TO_TEXT"
                 type: "aws_proxy"
@@ -503,7 +493,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/ItemId"
+                                $ref: "#/components/schemas/ItemCreated"
                 400:
                     description: "invalid input, object invalid"
                 409:
@@ -515,16 +505,6 @@ paths:
             x-amazon-apigateway-integration:
                 httpMethod: "POST"
                 uri: "arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-central-1:118101356080:function:AddSongFunction/invocations"
-                responses:
-                    default:
-                        statusCode: "200"
-                        responseParameters:
-                            method.response.header.Access-Control-Allow-Headers: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key'''
-                            method.response.header.Access-Control-Allow-Methods: '''*'''
-                            method.response.header.Access-Control-Allow-Origin: '''*'''
-                        responseTemplates:
-                            application/json: |
-                                {}
                 passthroughBehavior: "when_no_match"
                 contentHandling: "CONVERT_TO_TEXT"
                 type: "aws_proxy"
@@ -853,9 +833,16 @@ components:
                 minimum: 0
                 format: "int32"
     schemas:
-        ItemId:
-            type: string
-            example: "5ddd3f95ee07e600231e9a4c"
+        ItemCreated:
+            type: "object"
+            required:
+                - "id"
+            properties:
+                id:
+                    type: "string"
+                    example: "5ddd3f95ee07e600231e9a4c"
+            example:
+                id: "5ddd3f95ee07e600231e9a4c"
         NoteItem:
             type: "object"
             required:

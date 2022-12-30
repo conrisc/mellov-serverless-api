@@ -1,5 +1,6 @@
 import { getDB } from "../services/database.service.mjs";
 import { corsHeaders } from "../utils/cors-headers.util.mjs";
+import { ItemCreated } from "../models/item-created.model.mjs";
 
 export const addSongHandler = async (event) => {
     if (event.httpMethod !== 'POST') {
@@ -32,7 +33,7 @@ export const addSongHandler = async (event) => {
             response = {
                 statusCode: 201,
                 headers: corsHeaders(),
-                body: insertResult.insertedId.toHexString()
+                body: JSON.stringify(new ItemCreated(insertResult.insertedId.toHexString())),
             };
         } catch (error) {
             console.log(`Error while inserting song: ${error}`);
