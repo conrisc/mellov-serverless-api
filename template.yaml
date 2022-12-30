@@ -183,6 +183,21 @@ Resources:
                         Path: /songs/{songId}
                         Method: PUT
 
+    DeleteSongFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: DeleteSongFunction
+            Handler: src/handlers/delete-song.deleteSongHandler
+            Description: Delete song
+            Role: !GetAtt LambdaEndpointRole.Arn
+            Events:
+                MellovApi:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref MellovApiGateway
+                        Path: /songs/{songId}
+                        Method: DELETE
+
     GetTagsFunction:
         Type: AWS::Serverless::Function
         Properties:
