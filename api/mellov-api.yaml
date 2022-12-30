@@ -2,7 +2,7 @@ openapi: 3.0.1
 
 info:
     description: "Mellov API"
-    version: 1.0.0
+    version: 1.1.0
     title: "Mellov API"
     license:
         name: "Apache 2.0"
@@ -738,6 +738,145 @@ paths:
             x-amazon-apigateway-integration:
                 httpMethod: "POST"
                 uri: "arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-central-1:118101356080:function:GetTagsFunction/invocations"
+                responses:
+                    default:
+                        statusCode: "200"
+                        responseParameters:
+                            method.response.header.Access-Control-Allow-Headers: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key'''
+                            method.response.header.Access-Control-Allow-Methods: '''*'''
+                            method.response.header.Access-Control-Allow-Origin: '''*'''
+                        responseTemplates:
+                            application/json: |
+                                {}
+                passthroughBehavior: "when_no_match"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws_proxy"
+        post:
+            tags:
+                - "users"
+            summary: "Add tag"
+            description: "Add tag"
+            operationId: "addTag"
+            requestBody:
+                description: "Tag to add"
+                required: true
+                content:
+                    'application/json':
+                        schema:
+                            $ref: "#/components/schemas/TagItem"
+            responses:
+                201:
+                    description: "item added"
+                    headers:
+                        Access-Control-Allow-Origin:
+                            schema:
+                                type: string
+                        Access-Control-Allow-Methods:
+                            schema:
+                                type: string
+                        Access-Control-Allow-Headers:
+                            schema:
+                                type: string
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ItemCreated"
+                400:
+                    description: "invalid input, object invalid"
+                409:
+                    description: "an existing item already exists"
+            security:
+                - MellovAuthorizer:
+                    - "aws.cognito.signin.user.admin"
+            x-swagger-router-controller: "Users"
+            x-amazon-apigateway-integration:
+                httpMethod: "POST"
+                uri: "arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-central-1:118101356080:function:AddTagFunction/invocations"
+                passthroughBehavior: "when_no_match"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws_proxy"
+    /tags/{tagId}:
+        options:
+            summary: CORS support
+            description: |
+                Enable CORS by returning correct headers
+            tags:
+                - CORS
+            parameters:
+                -
+                    name: "tagId"
+                    in: "path"
+                    description: "The tag Id"
+                    required: true
+                    schema:
+                        type: "string"
+            responses:
+                200:
+                    description: Default response for CORS method
+                    headers:
+                        Access-Control-Allow-Origin:
+                            schema:
+                                type: string
+                        Access-Control-Allow-Methods:
+                            schema:
+                                type: string
+                        Access-Control-Allow-Headers:
+                            schema:
+                                type: string
+                    content: {}
+            x-amazon-apigateway-integration:
+                type: mock
+                requestTemplates:
+                    application/json: |
+                        {
+                            "statusCode" : 200
+                        }
+                responses:
+                    default:
+                        statusCode: "200"
+                        responseParameters:
+                            method.response.header.Access-Control-Allow-Headers: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key'''
+                            method.response.header.Access-Control-Allow-Methods: '''*'''
+                            method.response.header.Access-Control-Allow-Origin: '''*'''
+                        responseTemplates:
+                            application/json: |
+                                {}
+        delete:
+            tags:
+                - "users"
+            summary: "Delete tag"
+            description: "Delete tag"
+            operationId: "deleteTag"
+            parameters:
+                -
+                    name: "tagId"
+                    in: "path"
+                    description: "The tag Id"
+                    required: true
+                    schema:
+                        type: "string"
+            responses:
+                204:
+                    description: "item deleted"
+                    headers:
+                        Access-Control-Allow-Origin:
+                            schema:
+                                type: string
+                        Access-Control-Allow-Methods:
+                            schema:
+                                type: string
+                        Access-Control-Allow-Headers:
+                            schema:
+                                type: string
+                400:
+                    description: "invalid input, object invalid"
+            security:
+                - MellovAuthorizer:
+                    - "aws.cognito.signin.user.admin"
+            x-swagger-router-controller: "Users"
+            x-amazon-apigateway-integration:
+                httpMethod: "POST"
+                uri: "arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-central-1:118101356080:function:DeleteTagFunction/invocations"
                 responses:
                     default:
                         statusCode: "200"

@@ -213,6 +213,36 @@ Resources:
                         Path: /tags
                         Method: GET
 
+    AddTagFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: AddTagFunction
+            Handler: src/handlers/add-tag.addTagHandler
+            Description: Add tag
+            Role: !GetAtt LambdaEndpointRole.Arn
+            Events:
+                MellovApi:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref MellovApiGateway
+                        Path: /tags
+                        Method: POST
+
+    DeleteTagFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: DeleteTagFunction
+            Handler: src/handlers/delete-tag.deleteTagHandler
+            Description: Delete tag
+            Role: !GetAtt LambdaEndpointRole.Arn
+            Events:
+                MellovApi:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref MellovApiGateway
+                        Path: /tags/{tagId}
+                        Method: DELETE
+
     GetYtItemsFunction:
         Type: AWS::Serverless::Function
         Properties:
