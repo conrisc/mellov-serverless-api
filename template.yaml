@@ -153,6 +153,22 @@ Resources:
                         Path: /songs
                         Method: GET
 
+    AddSongFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: AddSongFunction
+            Handler: src/handlers/add-song.addSongHandler
+            Description: Add song
+            Role: !GetAtt LambdaEndpointRole.Arn
+            Events:
+                MellovApi:
+                    Type: Api
+                    Properties:
+                        RestApiId: !Ref MellovApiGateway
+                        Path: /songs
+                        Method: POST
+
+
     GetTagsFunction:
         Type: AWS::Serverless::Function
         Properties:
