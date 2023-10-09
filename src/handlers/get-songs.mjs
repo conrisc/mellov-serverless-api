@@ -11,7 +11,11 @@ export const getSongsHandler = async (event) => {
     const collectionName = 'songs';
 
     let { skip = 0, limit = 10, title = '', sort = '' } = event.queryStringParameters || {};
-    const { tags = [] } = event.multiValueQueryStringParameters || {};
+    let { tags = [] } = event.multiValueQueryStringParameters || {};
+
+    if (tags.length === 1 && tags[0].includes(',')) {
+        tags = tags[0].split(',');
+    }
 
     skip = parseInt(skip);
     limit = parseInt(limit);
