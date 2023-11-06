@@ -1,14 +1,19 @@
 import { MongoClient } from 'mongodb';
-import { resolveSecret } from './secrets.service.mjs';
+import { resolveParameters } from './parameter-store.service.mjs';
 
 const dbCluster = process.env.DB_CLUSTER;
-const dbCredentialsSecretName = process.env.DB_CREDENTIALS_SECRET_NAME;
+const dbUsernameSsmParameter = process.env.DB_USERNAME_SSM_PARAMETER;
+const dbPasswordSsmParameter = process.env.DB_PASSWORD_SSM_PARAMETER;
 let dbClient;
 
 export async function getDB() {
     if (!dbClient) {
-        const dbCredentials = await resolveSecret(dbCredentialsSecretName);
-        const { username: dbUsername, password: dbPassword } = dbCredentials;
+        const dbCredentials = await resolveParameters([
+            dbUsernameSsmParameter,
+            dbPasswordSsmParameter,
+        ], true);
+        const dbUsername = dbCredentials[dbUsernameSsmParameter];
+        const dbPassword = dbCredentials[dbPasswordSsmParameter];
         const uri = `mongodb+srv://${dbUsername}:${dbPassword}@${dbCluster}?retryWrites=true&w=majority`;
         dbClient = new MongoClient(uri, { useUnifiedTopology: true });
 

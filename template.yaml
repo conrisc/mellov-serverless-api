@@ -9,9 +9,12 @@ Parameters:
     DbClusterParameter:
         Type: String
         Default: 'what-appy-cluster.gsicl.mongodb.net/what'
-    DbCredentialsSecretNameParameter:
-        Type: String
-        Default: mellov/db
+    DbUsernameSsmParameter:
+        Type: AWS::SSM::Parameter::Name
+        Default: /prod/mellov/db/username
+    DbPasswordSsmParameter:
+        Type: AWS::SSM::Parameter::Name
+        Default: /prod/mellov/db/password
     MellovClientUrlParameter:
         Type: String
         Default: http://localhost:8080
@@ -35,7 +38,8 @@ Globals:
         Environment:
             Variables:
                 DB_CLUSTER: !Ref DbClusterParameter
-                DB_CREDENTIALS_SECRET_NAME: !Ref DbCredentialsSecretNameParameter
+                DB_USERNAME_SSM_PARAMETER: !Ref DbUsernameSsmParameter
+                DB_PASSWORD_SSM_PARAMETER: !Ref DbPasswordSsmParameter
                 MELLOV_CLIENT_URL: !Ref MellovClientUrlParameter
 
 Resources:
@@ -272,17 +276,18 @@ Resources:
                         Action: sts:AssumeRole
             ManagedPolicyArns:
                 - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-            Policies:
-                -
-                    PolicyName: AccessSecretManager
-                    PolicyDocument:
-                        Version: '2012-10-17'
-                        Statement:
-                            -
-                                Effect: Allow
-                                Action:
-                                    - secretsmanager:GetSecretValue
-                                Resource: '*'
+                - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
+            # Policies:
+                # -
+                #     PolicyName: AccessSecretManager
+                #     PolicyDocument:
+                #         Version: '2012-10-17'
+                #         Statement:
+                #             -
+                #                 Effect: Allow
+                #                 Action:
+                #                     - secretsmanager:GetSecretValue
+                #                 Resource: '*'
 
 Outputs:
     WebEndpoint:
