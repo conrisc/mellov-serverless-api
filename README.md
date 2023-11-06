@@ -1,5 +1,17 @@
 # mellov-serverless-api
 
+
+## Building and deploying
+
+First login to CodeArtifact using `aws codeartifact login` command (with proper parameters, which you can find in the CodeArtifact).
+
+To build project run:  
+`sam build`
+
+To deploy project run:  
+`sam deploy --guided`
+
+
 ## Generating Mellov API Client
 
 ### Locally
