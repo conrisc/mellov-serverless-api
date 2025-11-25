@@ -30,7 +30,7 @@ Parameters:
 
 Globals:
     Function:
-        Runtime: nodejs18.x
+        Runtime: nodejs24.x
         Timeout: 60
         MemorySize: 128
         Architectures:
